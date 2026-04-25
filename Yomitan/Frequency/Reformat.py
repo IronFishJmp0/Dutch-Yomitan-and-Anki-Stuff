@@ -36,11 +36,11 @@ class FrequencyDict:
         print(f"GetRank:: Terms contains {len(Terms)} elements.")
 
         TermBank = []
-        for term in Terms:
+        for i in range(len(Terms) - 1, -1, -1):
             freq = {}
-            freq["reading"] = term.Term
-            freq["frequency"] = term.Occurrence
-            TermBank.append([term.Term, "freq", freq])
+            freq["reading"] = Terms[i].Term
+            freq["frequency"] = Terms[i].Occurrence
+            TermBank.append([Terms[i].Term, "freq", freq])
 
         return TermBank
 
@@ -53,22 +53,22 @@ class FrequencyDict:
         print(f"GetRank:: Terms contains {len(Terms)} elements.")
 
         TermBank = []
-        rank = 1
+        rank = 0
         lastOcc = 0
         sameCount = 1
-        for term in Terms:
+        for i in range(len(Terms) - 1, -1, -1):
             freq = {}
-            freq["reading"] = term.Term
-            if term.Rank == lastOcc:
+            freq["reading"] = Terms[i].Term
+            if Terms[i].Rank == lastOcc:
                 freq["frequency"] = rank
                 sameCount += 1
             else:
                 rank += sameCount
                 sameCount = 1
-                lastOcc = term.Occurrence
+                lastOcc = Terms[i].Occurrence
                 freq["frequency"] = rank
 
-            TermBank.append([term.Term, "freq", freq])
+            TermBank.append([Terms[i].Term, "freq", freq])
 
         return TermBank
 
@@ -148,11 +148,20 @@ if args.rank and args.occurance:
 
 freqDict = FrequencyDict(isRank=args.rank, Title=args.title[0])
 if args.revision:
-    freqDict.revision = args.revision
+    if type(args.revision) == str:
+        freqDict.Revision = args.revision
+    else:
+        freqDict.Revision = args.revision[0]
 if args.description:
-    freqDict.description = args.description
+    if type(args.description) == str:
+        freqDict.Description = args.description
+    else:
+        freqDict.Description = args.description[0]
 if args.author:
-    freqDict.author = args.author
+    if type(args.description) == str:
+        freqDict.Author = args.author
+    else:
+        freqDict.Author = args.author[0]
 
 termCol = args.term_col[0]
 valCol = args.val_col[0]
