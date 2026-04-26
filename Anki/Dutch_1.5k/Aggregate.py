@@ -100,7 +100,7 @@ class FreqList:
         self.List = []
         self.Pattern = re.compile(r"^[a-zëéèêïöóüçáàäûîíôúñâÅ'\ \-]+$", re.IGNORECASE)
 
-    def Add(self, word, occurance):
+    def Add(self, word, occurrence):
         word = word.lower()
         if not self.Pattern.match(word):
             with open("non-matching-words.txt", "a") as f:
@@ -111,9 +111,9 @@ class FreqList:
         match, index = getIndex(self.List, word)
         if match:
             #print(f"Adding {word} and {self.List[index][0]}")
-            self.List[index][1] += occurance
+            self.List[index][1] += occurrence
         else:
-            self.List.insert(index, [word, occurance])
+            self.List.insert(index, [word, occurrence])
 
     def GenerateSorted(self):
         self.SortedList = sorted(self.List, key=lambda Term: Term[1], reverse=True)
