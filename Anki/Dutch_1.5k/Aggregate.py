@@ -24,7 +24,7 @@ files = [
             "name":"hermitdave_OpenSubs",
             "term":0,
             "val":1,
-            "weight":10,
+            "weight":7,
             "separator":" "
         }, {
             "path":"./FrequencyDicts/nld_news_2024_1M/nld_news_2024_1M-words.txt",
@@ -149,24 +149,24 @@ for lst in lists:
 
 
 
-"""
 
 
 #write out the top 1.5k words from each list.
 for lst in lists:
-    fname = lst.Name + "_1.5k.tsv"
+    fname = lst.Name + "_2k.tsv"
     print(f"Writing {fname}")
     with open(fname, "w") as f:
         for i in range(0, len(lst.SortedList)):
-            if i < 1500:
+            if i < 2000:
                 f.write(f"{lst.SortedList[i][0]}\t{lst.SortedList[i][1]}\n")
+"""
 
 print(f"Creating combined weighted list")
 comb = []
 combName = ""
 for lst in lists:
     print(f"\tAdding {lst.Name} with weight {lst.Weight}")
-    combName += f"{lst.Name}_weighted-{lst.Weight}_"
+    combName += f"{lst.Name}_w{lst.Weight}_"
     if len(comb) == 0:
         for item in lst.List:
             comb.append([item[0], item[1] * lst.Weight])
@@ -179,23 +179,69 @@ for lst in lists:
             continue
         comb.insert(index, [item[0], item[1] * lst.Weight])
 
-
+""""
 print(f"Writing combined list (full): {combName + "combined_alphabetical.tsv"}")
 with open(combName + "combined_alphabetical.tsv", "w") as f:
     for item in comb:
         f.write(f"{item[0]}\t{item[1]}\n")
+"""
 
 combOcc = sorted(comb, key=lambda Term: Term[1], reverse=True)
 
 combName += "combined_occurance.tsv"
+
 print(f"Writing combined list (full): {combName}")
 with open(combName, "w") as f:
     for item in combOcc:
         f.write(f"{item[0]}\t{item[1]}\n")
 
-combName = "1.5k_" + combName
-print(f"Writing combined list (1.5k): {combName}")
+
+combName = "2k_" + combName
+print(f"Writing combined list (2k): {combName}")
 with open(combName, "w") as f:
     for i in range(0, len(combOcc)):
-        if i < 1500:
+        if i < 2000:
             f.write(f"{combOcc[i][0]}\t{combOcc[i][1]}\n")
+
+
+
+print("Creating rank weighted combined list.")
+rank = []
+rankName = ""
+#step one, copy the first list over from SortedList, replacing occurances with weighted rank
+#Step two, sort the list
+#Step three, add the remaining lists in, again taking from SortedList
+for lst in lists:
+    print(f"\tAdding {lst.Name} with weight {lst.Weight}")
+    rankName += f"{lst.Name}_w{lst.Weight}_"
+    if len(rank) == 0:
+        for i in range(0, len(lst.SortedList)):
+            rank.append([lst.SortedList[i][0], lst.Weight * i])
+        rank = sorted(rank, key=lambda Item: Item[0])
+        continue
+
+    for i in range(0, len(lst.SortedList)):
+        match, index = getIndex(rank, lst.SortedList[i][0])
+        if match:
+            rank[index][1] += lst.Weight * i
+            continue
+
+        rank.insert(index, [lst.SortedList[i][0], lst.Weight * i])
+
+
+rankName += "weighted_rank.tsv"
+rank = sorted(rank, key=lambda Term: Term[1])
+
+print(f"Writing combined rank list (full): {rankName}")
+with open(rankName, "w") as f:
+    for item in rank:
+        f.write(f"{item[0]}\t{item[1]}\n")
+
+
+rankName = "2k_" + rankName
+print(f"Writing combined rank list (2k): {rankName}")
+with open(rankName, "w") as f:
+    for i in range(0, len(rank)):
+        if i < 2000:
+            f.write(f"{rank[i][0]}\t{rank[i][1]}\n")
+
